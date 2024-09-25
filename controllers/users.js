@@ -7,10 +7,11 @@ const router = express.Router();
 const db = require("../db/models");
 //Criptografar sennha
 const bcrypt = require('bcryptjs')
-
 const { where } = require('sequelize');
 
+
 //Criar rota listar
+//Endereço para acessar a api através de aplicação externa: http://localhost:8080/users?page=1
 router.get("/users", async (req, res) => {
 
     //Receber o número da página, quando não é enviado o número da página é atribuido página 1

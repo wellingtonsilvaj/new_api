@@ -11,10 +11,12 @@ app.use(express.json());
 //Incluir as controllers
 const users = require("./controllers/users");
 const situations = require("./controllers/situations");
+const login = require("./controllers/login");
 
 //Criar rotas
 app.use('/', users);
 app.use('/', situations);
+app.use('/', login);
 
 
 
