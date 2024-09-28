@@ -3,19 +3,25 @@
 const express = require('express');
 //Chamar a função express
 const router = express.Router();
-//Incluir conexão com o BD
-const db = require("../db/models");
 //Criptografar sennha
 const bcrypt = require('bcryptjs')
-const { where } = require('sequelize');
+//Valida input do formulario
+const yup = require('yup');
+//Incluir o arquivo para validar token
+const {eAdmin } = require('../services/authServices');
+//Incluir conexão com o BD
+const db = require("../db/models");
 
 
 //Criar rota listar
 //Endereço para acessar a api através de aplicação externa: http://localhost:8080/users?page=1
-router.get("/users", async (req, res) => {
+router.get("/users", eAdmin, async (req, res) => {
 
     //Receber o número da página, quando não é enviado o número da página é atribuido página 1
     const { page = 1 } = req.query;
+    //Recuperar os valores que estão no token, tratado no authService.js
+   // console.log(req.userId);
+   // console.log(req.userName);
 
     //Limite de registros em cada página
     const limit = 40;
@@ -74,7 +80,7 @@ router.get("/users", async (req, res) => {
 });
 
 //Criar rota visualizar
-router.get("/users/:id", async (req, res) => {
+router.get("/users/:id",eAdmin, async (req, res) => {
 
     //http://localhost:8080/users/4
     const { id } = req.params;
@@ -113,10 +119,35 @@ router.get("/users/:id", async (req, res) => {
 });
 
 //Criar rota cadastrar
-router.post("/users", async (req, res) => {
+router.post("/users", eAdmin, async (req, res) => {
 
     //Receber os dados enviados no corpo da requisição
     var data = req.body;
+
+    //Validar os campos ultilizando o yup
+    const schema = yup.object().shape({
+        situationId: yup.number("Erro: Necessário preencher o campo situação!")
+            .required("Erro: Necessário preencher o campo situação!"),
+        password: yup.string("Erro: Necessário preencher o campo senha!")
+            .required("Erro: Necessário preencher o campo senha!"),
+        email: yup.string("Erro: Necessário preencher o campo email!")
+            .required("Erro: Necessário preencher o campo email!")
+            .email("Erro: Necessário preencher e-mail válido!"),
+        name: yup.string("Erro: Necessário preencher o campo nome!")
+            .required("Erro: Necessário preencher o campo nome!"), 
+    });
+
+    //Verificar se todos os campos passaram pela validação
+    try {
+        await schema.validate(data);
+    } catch (error) {
+        //Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: error.errors
+
+        });
+    }
 
     //Criptografar a senha
     data.password = await bcrypt.hash(String(data.password), 8);
@@ -148,10 +179,33 @@ router.post("/users", async (req, res) => {
     "email": "well77@well.com.br",
     "situationId": 1
 }*/
-router.put("/users/", async (req, res) => {
+router.put("/users/",eAdmin, async (req, res) => {
 
     //Receber os dados enviados no corpo da requisição
     const data = req.body;
+
+     //Validar os campos ultilizando o yup
+     const schema = yup.object().shape({
+        situationId: yup.number("Erro: Necessário preencher o campo situação!")
+            .required("Erro: Necessário preencher o campo situação!"),
+        email: yup.string("Erro: Necessário preencher o campo email!")
+            .required("Erro: Necessário preencher o campo email!")
+            .email("Erro: Necessário preencher e-mail válido!"),
+        name: yup.string("Erro: Necessário preencher o campo nome!")
+            .required("Erro: Necessário preencher o campo nome!"), 
+    });
+
+    //Verificar se todos os campos passaram pela validação
+    try {
+        await schema.validate(data);
+    } catch (error) {
+        //Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: error.errors
+
+        });
+    }
 
     //Editar no BD
     await db.Users.update(data, { where: { id: data.id } })
@@ -173,7 +227,7 @@ router.put("/users/", async (req, res) => {
 
 });
 //Criar rota delete
-router.delete("/users/:id", async (req, res) => {
+router.delete("/users/:id",eAdmin, async (req, res) => {
 
     //Receber o parâmetro enviado na URL
     const { id } = req.params;

@@ -3,18 +3,45 @@
 const express = require('express');
 //Chamar a função express
 const router = express.Router();
-//Incluir conexão com o BD
-const db = require("../db/models");
 //Criptografar sennha
 const bcrypt = require('bcryptjs');
+//Valida input do formulario
+const yup = require('yup');
 //Gerar token de autenticação
 const jwt = require('jsonwebtoken');
+//Incluir o arquivo com as variáveis de ambiente
+require('dotenv').config();
+//Incluir conexão com o BD
+const db = require("../db/models");
+
+
 //Criar rota login
 //Endereço para acessar a api através de aplicação externa: http://localhost:8080/login
-router.post("/login", async (req, res) => {
+router.post("/login",  async (req, res) => {
 
     //Receber os dados enviados no corpo da requisição
     var data = req.body;
+
+     //Validar os campos ultilizando o yup
+     const schema = yup.object().shape({
+        password: yup.string("Erro: Necessário preencher o campo Senha!")
+        .required("Erro: Necessário preencher o campo Senha!"),
+        email: yup.string("Erro: Necessário preencher o campo E-mail")
+        .required("Erro: Necessário preencher o campo E-mail!")
+        .email("Erro: Necessário preencher e-mail válido!"),
+    });
+
+     //Verificar se todos os campos passaram pela validação
+     try {
+        await schema.validate(data);
+    } catch (error) {
+        //Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: error.errors
+
+        });
+    }
     
     //Recuperar o registro do BD
     const user = await db.Users.findOne({
@@ -44,7 +71,8 @@ router.post("/login", async (req, res) => {
    }
 
    //Gerar token de autenticação
-   const token = jwt.sign({ id: user.id}, "ljsad5d85df5as8das4",{
+   const token = jwt.sign({ id: user.id /*name: user.name */}, process.env.SECRET,
+    {
     expiresIn: 600 //10m
    });
 

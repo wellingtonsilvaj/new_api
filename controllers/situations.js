@@ -3,16 +3,37 @@
 const express = require('express');
 //Chamar a função express
 const router = express.Router();
-
+//Valida input do formulario
+const yup = require('yup');
+//Incluir o arquivo para validar token
+const {eAdmin } = require('../services/authServices');
 //Incluir conexão com o BD
 const db = require("../db/models");
 
+
 //Criar rota cadastrar
-router.post("/situations", async (req, res) => {
+router.post("/situations", eAdmin, async (req, res) => {
 
     //Receber os dados enviados no corpo da requisição
     var data = req.body;
 
+    //Validar os campos ultilizando o yup
+    const schema = yup.object().shape({
+        nameSituation: yup.string("Erro: Necessário preencher o campo Nome da Situação!")
+        .required("Erro: Necessário preencher o campo Nome da Situação!"),
+    });
+
+     //Verificar se todos os campos passaram pela validação
+     try {
+        await schema.validate(data);
+    } catch (error) {
+        //Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: error.errors
+
+        });
+    }
     //Salvar  no BD
     await db.Situations.create(data).then((dataSituation) => {
         //Retornar objeto como resposta
@@ -32,7 +53,7 @@ router.post("/situations", async (req, res) => {
 });
 
 //Criar rota listar
-router.get("/situations", async (req, res) => {
+router.get("/situations", eAdmin, async (req, res) => {
 
     //Receber o número da página, quando não é enviado o número da página é atribuido página 1
     const { page = 1 } = req.query;
@@ -91,7 +112,7 @@ router.get("/situations", async (req, res) => {
 });
 
 //Criar rota visualizar
-router.get("/situations/:id", async (req, res) => {
+router.get("/situations/:id",eAdmin, async (req, res) => {
 
     //http://localhost:8080/situations/4
     const { id } = req.params;
@@ -129,10 +150,30 @@ router.get("/situations/:id", async (req, res) => {
     "id": "1",
     "nameSituation":"Ativo"
 } */
-router.put("/situations/", async (req, res) => {
+router.put("/situations/",eAdmin, async (req, res) => {
 
     //Receber os dados enviados no corpo da requisição
     const data = req.body;
+
+    //Validar os campos ultilizando o yup
+    const schema = yup.object().shape({
+        nameSituation: yup.string("Erro: Necessário preencher o campo Nome da Situação!")
+            .required("Erro: Necessário preencher o campo Nome da Situação!"),
+        id: yup.string("Erro: Necessário preencher o campo Id da situação")
+            .required("Erro: Necessário preencher o campo Id da situção"),
+    });
+
+     //Verificar se todos os campos passaram pela validação
+     try {
+        await schema.validate(data);
+    } catch (error) {
+        //Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: error.errors
+
+        });
+    }
 
     //Editar no BD
     await db.Situations.update(data, { where: { id: data.id } })
@@ -154,7 +195,7 @@ router.put("/situations/", async (req, res) => {
 });
 
 //Criar rota delete
-router.delete("/situations/:id", async (req, res) => {
+router.delete("/situations/:id",eAdmin, async (req, res) => {
 
     //Receber o parâmetro enviado na URL
     const { id } = req.params;
