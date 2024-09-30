@@ -7,6 +7,8 @@ const router = express.Router();
 const bcrypt = require('bcryptjs')
 //Valida input do formulario
 const yup = require('yup');
+//Operador do sequelize
+const { Op } = require("sequelize");
 //Incluir o arquivo para validar token
 const {eAdmin } = require('../services/authServices');
 //Incluir conexão com o BD
@@ -149,6 +151,29 @@ router.post("/users", eAdmin, async (req, res) => {
         });
     }
 
+    //Recuperar o registro do BD
+    const user = await db.Users.findOne({
+        
+        //Indicar quais colunas recuperar
+        attributes: ['id'],
+
+        //Acrescentando condição para indicar qual registro deve ser retornado do BD
+        where: {email: data.email}
+
+    });
+
+    //Acessa o IF se encontrar o registro no BD
+    if(user){
+        //Retornar objeto como resposta
+         //Retornar objeto como resposta
+         return res.status(400).json({
+            error: true,
+            message: "Erro: Este e-mail já está cadastrado!"
+        });
+
+    }
+
+        
     //Criptografar a senha
     data.password = await bcrypt.hash(String(data.password), 8);
     
@@ -207,6 +232,34 @@ router.put("/users/",eAdmin, async (req, res) => {
         });
     }
 
+    //Recuperar o registro do BD
+    const user = await db.Users.findOne({
+        
+        //Indicar quais colunas recuperar
+        attributes: ['id'],
+
+        //Acrescentando condição para indicar qual registro deve ser retornado do BD
+        where: {email: data.email,
+            id: {
+                //Operador de negação para ignorar o registro do usuario que está sendo editado
+                [Op.ne]: data.id
+            }
+        }
+
+    });
+
+    //Acessa o IF se encontrar o registro no BD
+    if(user){
+        //Retornar objeto como resposta
+         //Retornar objeto como resposta
+         return res.status(400).json({
+            error: true,
+            message: "Erro: Este e-mail já está cadastrado!"
+        });
+
+    }
+
+
     //Editar no BD
     await db.Users.update(data, { where: { id: data.id } })
         .then(() => {
@@ -224,6 +277,23 @@ router.put("/users/",eAdmin, async (req, res) => {
 
             });
         });
+
+});
+
+//Criar a rota editar imagem e receber o parâmetro id enviado na url
+//Endereço para acessar através da aplicação externa: http://localhost:8080/users/users-image/1
+router.put("/users-image/:id", async (req, res) =>{
+
+    //Receber o id enviado na URL
+    const { id } = req.params;
+    console.log(id);
+
+    //Retornar objeto como resposta
+    return res.status(400).json({
+        error: false,
+        message: "Imagem editada com sucesso!"
+
+    });
 
 });
 //Criar rota delete
