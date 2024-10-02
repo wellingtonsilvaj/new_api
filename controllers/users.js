@@ -8,11 +8,15 @@ const bcrypt = require('bcryptjs')
 //Valida input do formulario
 const yup = require('yup');
 //Operador do sequelize
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 //Incluir o arquivo para validar token
 const {eAdmin } = require('../services/authServices');
 //Incluir conexão com o BD
 const db = require("../db/models");
+//Incluir o arquivo com a função de upload
+const upload = require('../services/uploadImgUserServices');
+//O modulo fs permite interagir com o sistema de arquivos
+const fs = require('fs');
 
 
 //Criar rota listar
@@ -91,7 +95,7 @@ router.get("/users/:id",eAdmin, async (req, res) => {
     const user = await db.Users.findOne({
 
         //Indicar quais colunas recuperar
-        attributes: ['id', 'name', 'email', 'situationId', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'name', 'email', 'situationId', 'image', 'createdAt', 'updatedAt'],
 
         //Acrescentando condição para qual registro deve ser retornado do BD
         where: { id },
@@ -105,6 +109,17 @@ router.get("/users/:id",eAdmin, async (req, res) => {
 
     //Acessa o IF se encontrar o registro no BD
     if (user) {
+        
+        //Acessa o if quando o usuário possui a imagem
+        if(user.dataValues.image){
+            console.log(user.dataValues.image);
+            //Criar caminho da imagem
+            user.dataValues['image'] = process.env.URL_ADM + "/images/users/" + user.dataValues.image;
+
+        }else{
+            //Criar caminho da imagem
+            user.dataValues['image'] = process.env.URL_ADM + "/images/users/icon_user1.png" ;
+        }
         //Retonar objeto como resposta
         return res.json({
             error: false,
@@ -114,7 +129,7 @@ router.get("/users/:id",eAdmin, async (req, res) => {
         //Retornar objeto como resposta
         return res.status(400).json({
             error: false,
-            message: "Erro: Usuário encontrado!"
+            message: "Erro: Usuário não encontrado!"
         });
     }
 
@@ -282,20 +297,67 @@ router.put("/users/",eAdmin, async (req, res) => {
 
 //Criar a rota editar imagem e receber o parâmetro id enviado na url
 //Endereço para acessar através da aplicação externa: http://localhost:8080/users/users-image/1
-router.put("/users-image/:id", async (req, res) =>{
+router.put("/users-image/:id", upload.single('image'), async (req, res) =>{
 
     //Receber o id enviado na URL
     const { id } = req.params;
-    console.log(id);
+    //console.log(!req.file);
+    //Acessa o IF quando a extensão da imagem é invalida
+    if(!req.file) {
+        return res.status(400).json({
+            error: false,
+            message: "Erro: selecione uma imagem válida JPEG ou PNG!"
+    
+        });
+    }
 
-    //Retornar objeto como resposta
-    return res.status(400).json({
-        error: false,
-        message: "Imagem editada com sucesso!"
+    //Recuperar o registro no BD
+    const user = await db.Users.findOne({
+        //Indicar quais colunas recuperar
+        attributes: ['id', 'image'],
+
+        //Acrescentar condição para indicar qual registro deve ser retornado do BD
+        where: { id }
 
     });
 
+    //Verificar se o usuario tem imagem salva no BD
+    if(user.dataValues.image){
+        
+        //Criar o caminho da imagem que o usuario tem no BD
+        var imgOld = "./public/images/users/" + user.dataValues.image;
+
+        //fs.access usado para testar as permissões do arquivo
+        fs.access(imgOld, (error) => {
+
+            //Acessa o IF quando não tiver nenhum erro
+            if(!error){
+                //Apagar a imagem antiga
+                fs.unlink(imgOld, () => {});
+            }
+        });
+    }
+
+
+    //Editar no BD
+    db.Users.update(
+        { image: req.file.filename},
+        { where: {id} })
+        .then(() =>{
+            //Retornar objeto como resposta
+            return res.json({
+                error: false,
+                message: "Imagem editada com sucesso!"
+            });
+        }).catch(() =>{
+            //Retornar objeto como resposta
+            return res.status(400).json({
+                error: true,
+                message: "Imagem do usuário não editada!"
+            });
+        });
 });
+
 //Criar rota delete
 router.delete("/users/:id",eAdmin, async (req, res) => {
 
