@@ -1,0 +1,4 @@
+{"email":"well1@wellp.com.br","level":"error","message":"Tentativa de login com dados incorretos."}
+{"email":"well1@wellp.com.br","level":"warn","message":"Tentativa de login com email incorretos."}
+{"email":"well1@well.com.br","level":"warn","message":"Tentativa de login com senha incorretos."}
+{"date":"2024-10-02T23:50:38.457Z","email":"well90@well.com.br","level":"info","message":"Tentativa recuperar senha com e-mail incorreto."}

@@ -17,7 +17,8 @@ const db = require("../db/models");
 const upload = require('../services/uploadImgUserServices');
 //O modulo fs permite interagir com o sistema de arquivos
 const fs = require('fs');
-
+// Incluir o arquivo responsável em salvar os logs
+const logger = require('../services/loggerServices');
 
 //Criar rota listar
 //Endereço para acessar a api através de aplicação externa: http://localhost:8080/users?page=1
@@ -71,12 +72,20 @@ router.get("/users", eAdmin, async (req, res) => {
 
     //Acessa o ID se encontrar algum registro no BD
     if (users) {
+
+        // Salvar o log no nível info
+        logger.info({ message: "Listar usuários.", userId: req.userId, date: new Date() });
+
         //Retonar objeto como resposta
         return res.json({
             error: false,
             users
         });
     } else {
+
+        // Salvar o log no nível info
+        logger.info({ message: "Listar usuário não executado corretamente.", userId: req.userId, date: new Date() });
+
         //Retornar objeto como resposta
         return res.status(400).json({
             error: false,
@@ -109,6 +118,9 @@ router.get("/users/:id",eAdmin, async (req, res) => {
 
     //Acessa o IF se encontrar o registro no BD
     if (user) {
+
+        // Salvar o log no nível info
+        logger.info({ message: "Usuário visualizado.", id, userId: req.userId, date: new Date() });
         
         //Acessa o if quando o usuário possui a imagem
         if(user.dataValues.image){
@@ -126,6 +138,9 @@ router.get("/users/:id",eAdmin, async (req, res) => {
             user
         });
     } else {
+
+        // Salvar o log no nível info
+        logger.info({ message: "Usuário não encontrado.", id, userId: req.userId, date: new Date() });
         //Retornar objeto como resposta
         return res.status(400).json({
             error: false,
