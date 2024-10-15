@@ -165,6 +165,136 @@ router.put("/profile", eAdmin, async (req, res) => {
 
 });
 
+//Criar rota editar senha
+router.put("/profile-password", eAdmin, async (req, res) => {
+
+    // Receber os dados enviados no corpo da requisição
+    const data = req.body;
+
+    // Validar os campos utilizando o yup
+    const schema = yup.object().shape({
+        password: yup.string("Erro: Necessário preencher o campo senha!")
+            .required("Erro: Necessário preencher o campo senha!"),
+    });
+
+    // Verificar se todos os campos passaram pela validação
+    try {
+        await schema.validate(data);
+    } catch (error) {
+        // Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: error.errors
+        });
+    }
+
+    // Criptografar a senha
+    data.password = await bcrypt.hash(String(data.password), 8);
+
+    // Editar no BD
+    await db.Users.update(data, { where: { id: req.userId } })
+        .then(() => {
+
+            // Salvar o log no nível info
+            logger.info({ message: "Senha do perfil editado com sucesso.", id: req.userId, userId: req.userId, date: new Date() });
+
+            // Retornar objeto como resposta
+            return res.json({
+                error: false,
+                message: "Senha do perfil editado com sucesso!"
+            });
+        }).catch(() => {
+
+            // Salvar o log no nível info
+            logger.info({ message: "Senha do perfil não editado.", id: req.userId, userId: req.userId, date: new Date() });
+
+            // Retornar objeto como resposta
+            return res.status(400).json({
+                error: true,
+                message: "Erro: Senha do perfil não editado!"
+            });
+        });
+
+});
+
+// Criar a rota editar imagem e receber o parâmentro 
+// Endereço para acessar através da aplicação externa: http://localhost:8080/profile-image
+router.put("/profile-image", eAdmin, upload.single('image'), async (req, res) => {
+
+
+    // Acessa o IF quando a extensão da imagem é inválida
+    //console.log(req.file);
+    if (!req.file) {
+
+        // Salvar o log no nível info
+        logger.info({ message: "Enviado extensão da imagem inválida no editar imagem do usuário.", userId: req.userId, date: new Date() });
+
+        // Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: "Erro: Selecione uma imagem válida JPEG ou PNG!"
+        });
+    }
+
+    // Recuperar o registro do BD
+    const user = await db.Users.findOne({
+
+        // Indicar quais colunas recuperar
+        attributes: ['id', 'image'],
+
+        // Acrescentar condição para indicar qual registro deve ser retornado do BD
+        where: { id: req.userId }
+
+    });
+
+    // Verificar se o usuário tem imagem salva no BD
+    //console.log(user);
+    if (user.dataValues.image) {
+
+        // Criar o caminho da imagem que o usuário tem no BD
+        var imgOld = "./public/images/users/" + user.dataValues.image;
+
+        // fs.access usado para testar as permissões do arquivo
+        fs.access(imgOld, (error) => {
+
+            // Acessa o IF quando não tiver nenhum erro
+            if (!error) {
+
+                // Apagar a imagem antiga
+                fs.unlink(imgOld, () => {
+                    // Salvar o log no nível info
+                    logger.info({ message: "Excluida a imagem do usuário.", id: req.userId, image: user.dataValues.image, userId: req.userId, date: new Date() });
+                });
+            }
+        });
+    }
+
+    // Editar no BD
+    db.Users.update(
+        { image: req.file.filename },
+        { where: { id: req.userId } })
+        .then(() => {
+
+            // Salvar o log no nível info
+            logger.info({ message: "Imagem do perfil editado com sucesso.", image: req.file.filename, userId: req.userId, date: new Date() });
+
+            // Retornar objeto como resposta
+            return res.json({
+                error: false,
+                message: "Imagem editada com sucesso!"
+            });
+        }).catch(() => {
+
+            // Salvar o log no nível info
+            logger.info({ message: "Imagem do perfil não editado.", image: req.file.filename, userId: req.userId, date: new Date() });
+
+            // Retornar objeto como resposta
+            return res.status(400).json({
+                error: true,
+                message: "Erro: Imagem não editada!"
+            });
+        });
+});
 
 
 // Exportar a instrução que está dentro da constante router 

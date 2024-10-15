@@ -3,3 +3,24 @@
 {"date":"2024-10-15T00:19:01.417Z","level":"info","message":"Senha editada com sucesso."}
 {"date":"2024-10-15T00:19:17.626Z","email":"well7@well.com.br","level":"info","message":"Login realizado com sucesso."}
 {"date":"2024-10-15T00:19:39.709Z","level":"info","message":"Listar usuários.","userId":7}
+{"date":"2024-10-15T22:41:01.022Z","id":7,"image":"1727823831225328075138.png","level":"info","message":"Excluida a imagem do usuário.","userId":7}
+{"date":"2024-10-15T22:41:01.056Z","image":"1729032060995855352789.png","level":"info","message":"Imagem do perfil editado com sucesso.","userId":7}
+{"date":"2024-10-15T22:41:13.221Z","level":"info","message":"Enviado extensão da imagem inválida no editar imagem do usuário.","userId":7}
+{"date":"2024-10-15T22:41:19.358Z","id":7,"image":"1729032060995855352789.png","level":"info","message":"Excluida a imagem do usuário.","userId":7}
+{"date":"2024-10-15T22:41:19.362Z","image":"1729032079347359075906.png","level":"info","message":"Imagem do perfil editado com sucesso.","userId":7}
+{"date":"2024-10-15T22:44:20.348Z","id":7,"image":"1729032079347359075906.png","level":"info","message":"Excluida a imagem do usuário.","userId":7}
+{"date":"2024-10-15T22:44:20.373Z","image":"1729032260339856233996.png","level":"info","message":"Imagem do perfil editado com sucesso.","userId":7}
+{"date":"2024-10-15T23:03:18.102Z","id":7,"level":"info","message":"Senha do Perfil editado com sucesso.","userId":7}
+{"date":"2024-10-15T23:03:47.416Z","email":"well1@well.com.br","level":"warn","message":"Tentativa de login com senha incorreta."}
+{"date":"2024-10-15T23:04:36.921Z","email":"well1@well.com.br","level":"warn","message":"Tentativa de login com senha incorreta."}
+{"date":"2024-10-15T23:04:46.080Z","id":7,"level":"info","message":"Perfil visualizado.","userId":7}
+{"date":"2024-10-15T23:04:58.807Z","email":"well7@well.com.br","level":"info","message":"Login realizado com sucesso."}
+{"date":"2024-10-15T23:05:32.228Z","id":7,"level":"info","message":"Perfil visualizado.","userId":7}
+{"date":"2024-10-15T23:37:45.712Z","id":7,"level":"info","message":"Senha do usuário editado com sucesso.","userId":7}
+{"date":"2024-10-15T23:38:03.911Z","email":"well7@well.com.br","level":"warn","message":"Tentativa de login com senha incorreta."}
+{"date":"2024-10-15T23:38:08.315Z","email":"well7@well.com.br","level":"info","message":"Login realizado com sucesso."}
+{"date":"2024-10-15T23:41:17.239Z","email":"well7@well.com.br","level":"info","message":"Enviado e-mail com instruções para recuperar a senha."}
+{"date":"2024-10-15T23:43:01.238Z","level":"info","message":"Validar chave recuperar senha, chave válida."}
+{"date":"2024-10-15T23:43:24.685Z","level":"info","message":"Senha editada com sucesso."}
+{"date":"2024-10-15T23:43:29.553Z","level":"info","message":"Chave recuperar senha inválida."}
+{"date":"2024-10-15T23:43:41.566Z","email":"well7@well.com.br","level":"info","message":"Login realizado com sucesso."}
