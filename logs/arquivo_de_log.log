@@ -1,4 +1,5 @@
-{"email":"well1@wellp.com.br","level":"error","message":"Tentativa de login com dados incorretos."}
-{"email":"well1@wellp.com.br","level":"warn","message":"Tentativa de login com email incorretos."}
-{"email":"well1@well.com.br","level":"warn","message":"Tentativa de login com senha incorretos."}
-{"date":"2024-10-02T23:50:38.457Z","email":"well90@well.com.br","level":"info","message":"Tentativa recuperar senha com e-mail incorreto."}
+{"date":"2024-10-15T00:16:33.388Z","email":"well7@well.com.br","level":"info","message":"Enviado e-mail com instruções para recuperar a senha."}
+{"date":"2024-10-15T00:18:40.240Z","level":"info","message":"Validar chave recuperar senha, chave válida."}
+{"date":"2024-10-15T00:19:01.417Z","level":"info","message":"Senha editada com sucesso."}
+{"date":"2024-10-15T00:19:17.626Z","email":"well7@well.com.br","level":"info","message":"Login realizado com sucesso."}
+{"date":"2024-10-15T00:19:39.709Z","level":"info","message":"Listar usuários.","userId":7}

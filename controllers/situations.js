@@ -1,225 +1,275 @@
-//Incluir as bibliotecas
-//Gerencia as requisições, rotas e URLs, entre outras funcionalidades
+// Incluir as bibliotecas
+// Gerencia as requisições, rotas e URLs, entre outra funcionalidades
 const express = require('express');
-//Chamar a função express
+// Chamar a função express
 const router = express.Router();
-//Valida input do formulario
+// Validar input do formulário
 const yup = require('yup');
-//Incluir o arquivo para validar token
-const {eAdmin } = require('../services/authServices');
-//Incluir conexão com o BD
+// Incluir a conexão com BD
 const db = require("../db/models");
+// Incluir o arquivo para validar o token
+const { eAdmin } = require('../services/authService');
+// Incluir o arquivo responsável em salvar os logs
+const logger = require('../services/loggerServices');
 
+// Criar a rota listar
+// Endereço para acessar a api através de aplicação externa: http://localhost:8080/situations?page=1
+router.get("/situations", eAdmin, async (req, res) => {
 
-//Criar rota cadastrar
-router.post("/situations", eAdmin, async (req, res) => {
+    // Receber o número da página, quando não é enviado o número da página é atribuido página 1
+    const { page = 1 } = req.query;
 
-    //Receber os dados enviados no corpo da requisição
-    var data = req.body;
+    // Limite de registros em cada página
+    const limit = 40;
 
-    //Validar os campos ultilizando o yup
-    const schema = yup.object().shape({
-        nameSituation: yup.string("Erro: Necessário preencher o campo Nome da Situação!")
-        .required("Erro: Necessário preencher o campo Nome da Situação!"),
+    // Variável com o número da última página
+    var lastPage = 1;
+
+    // Contar a quantidade de registro no BD
+    const countSituations = await db.Situations.count();
+
+    // Acessa o IF quando encontrar registro no BD
+    if (countSituations !== 0) {
+
+        // Calcular a última página
+        lastPage = Math.ceil(countSituations / limit);
+
+    } else {
+        // Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: "Erro: Nenhuma situação encontrada!"
+        });
+    }
+
+    // Recuperar todas as situações do BD
+    const situations = await db.Situations.findAll({
+
+        // Indicar quais colunas recuperar
+        attributes: ['id', 'nameSituation'],
+
+        // Ordenar os registros pela coluna id na forma decrescente
+        order: [['nameSituation', 'ASC']],
+
+        // Calcular a partir de qual registro deve retornar e o limite de registros
+        offset: Number((page * limit) - limit),
+        limit: limit
     });
 
-     //Verificar se todos os campos passaram pela validação
-     try {
+    // Acessa o IF se encontrar o registro no BD
+    if (situations) {
+
+        // Salvar o log no nível info
+        logger.info({ message: "Listar situação.", userId: req.userId, date: new Date() });
+
+        // Retornar objeto como resposta
+        return res.json({
+            error: false,
+            situations
+        });
+    } else {
+
+        // Salvar o log no nível info
+        logger.info({ message: "Listar situação não executado corretamente.", userId: req.userId, date: new Date() });
+
+        // Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: "Erro: Nenhuma situação encontrada!"
+        });
+    }
+});
+
+// Criar a rota visualizar
+// Endereço para acessar a api através de aplicação externa: http://localhost:8080/situations/1
+router.get("/situations/:id", eAdmin, async (req, res) => {
+
+    // Receber o parâmetro enviado na URL
+    // http://localhost:8080/situations/1
+    const { id } = req.params;
+
+    // Recuperar o registro do BD
+    const situation = await db.Situations.findOne({
+
+        // Indicar quais colunas recuperar
+        attributes: ['id', 'nameSituation', 'createdAt', 'updatedAt'],
+
+        // Acrescentado condição para indicar qual registro deve ser retornado do BD
+        where: { id },
+    });
+
+    // Acessa o IF se encontrar o registro no BD
+    if (situation) {
+
+        // Salvar o log no nível info
+        logger.info({ message: "Situação visualizada.", id, userId: req.userId, date: new Date() });
+
+        // Retornar objeto como resposta
+        return res.json({
+            error: false,
+            situation
+        });
+    } else {
+
+        // Salvar o log no nível info
+        logger.info({ message: "Situação não encontrada.", id, userId: req.userId, date: new Date() });
+
+        // Retornar objeto como resposta
+        return res.status(400).json({
+            error: true,
+            message: "Erro: Situação não encontrada!"
+        });
+    }
+
+});
+
+// Criar a rota cadastrar
+// Endereço para acessar a api através de aplicação externa: http://localhost:8080/situations
+// A aplicação externa deve indicar que está enviado os dados em formato de objeto: Content-Type: application/json
+// Dados em formato de objeto
+/*
+{
+    "nameSituation": "Ativo"
+}
+*/
+router.post("/situations", eAdmin, async (req, res) => {
+
+    // Receber os dados enviados no corpo da requisição
+    var data = req.body;
+
+    // Validar os campos utilizando o yup
+    const schema = yup.object().shape({
+        nameSituation: yup.string("Erro: Necessário preencher o campo nome situação!")
+            .required("Erro: Necessário preencher o campo nome situação!"),
+    });
+
+    // Verificar se todos os campos passaram pela validação
+    try {
         await schema.validate(data);
     } catch (error) {
-        //Retornar objeto como resposta
+        // Retornar objeto como resposta
         return res.status(400).json({
             error: true,
             message: error.errors
-
         });
     }
-    //Salvar  no BD
+
+    // Salvar no BD
     await db.Situations.create(data).then((dataSituation) => {
-        //Retornar objeto como resposta
+
+        // Salvar o log no nível info
+        logger.info({ message: "Situação cadastrada com sucesso.", nameSituation: data.nameSituation, userId: req.userId, date: new Date() });
+
+        // Retornar objeto como resposta
         return res.json({
             error: false,
             message: "Situação cadastrada com sucesso!",
             dataSituation
         });
     }).catch(() => {
-        //Retornar objeto como resposta
+
+        // Salvar o log no nível info
+        logger.info({ message: "Situação não cadastrada.", nameSituation: data.nameSituation, userId: req.userId, date: new Date() });
+
+        // Retornar objeto como resposta
         return res.status(400).json({
             error: true,
-            message: "Erro: Situação não cadastrada com sucesso!",
-
+            message: "Erro: Situação não cadastrada com sucesso!"
         });
     });
 });
 
-//Criar rota listar
-router.get("/situations", eAdmin, async (req, res) => {
+// Criar a rota editar
+// Endereço para acessar a api através de aplicação externa: http://localhost:8080/situations
+// A aplicação externa deve indicar que está enviado os dados em formato de objeto Content-Type: application/json
+// Dados em formato de objeto
+/*{
+    "id": 1,
+    "nameSituation": "Ativo"
+}
+*/
+router.put("/situations", eAdmin, async (req, res) => {
 
-    //Receber o número da página, quando não é enviado o número da página é atribuido página 1
-    const { page = 1 } = req.query;
-
-    //Limite de registros em cada pag
-    const limit = 40;
-
-    //Variavel com o numero da ultima pag
-    var lastPage = 1;
-
-    //Contar a quantidade de registro no BD
-    const countSituation = await db.Situations.count();
-
-    //Acessa o IF quando encontrar registro no BD
-    if (countSituation !== 0) {
-
-        //calcular a ultima pág
-        lastPage = Math.ceil(countSituation / limit);
-        console.log(lastPage);
-
-    } else {
-        //Retornar objeto como resposta
-        return res.status(400).json({
-            error: false,
-            message: "Erro: Nenhuma situação encontrada!"
-        });
-    }
-
-
-    //Recuperar todos os usuarios do BD
-    const situations = await db.Situations.findAll({
-
-        //Indicar quais colunas recuperar 
-        attributes: ['id', 'nameSituation'],
-        order: [['id', 'DESC']],
-
-        //Calcular a partir de qual registro deve retorna e o limite de registros
-        offset: Number((page * limit) - limit),
-        limit: limit
-    });
-
-    //Acessa o ID se encontrar algum registro no BD
-    if (situations) {
-        //Retonar objeto como resposta
-        return res.json({
-            error: false,
-            situations
-        });
-    } else {
-        //Retornar objeto como resposta
-        return res.status(400).json({
-            error: false,
-            message: "Erro: Nenhuma situação encontrada!"
-        });
-    }
-});
-
-//Criar rota visualizar
-router.get("/situations/:id",eAdmin, async (req, res) => {
-
-    //http://localhost:8080/situations/4
-    const { id } = req.params;
-
-    //http://localhost:8080/situations/4?sit=5
-    const situation = await db.Situations.findOne({
-
-        //Indicar quais colunas recuperar
-        attributes: ['id', 'nameSituation', 'createdAt', 'updatedAt'],
-
-        //Acrescentando condição para qual registro deve ser retornado do BD
-        where: { id },
-
-    });
-    //Acessa o IF se encontrar o registro no BD
-    if (situation) {
-        //Retonar objeto como resposta
-        return res.json({
-            error: false,
-            situation
-        });
-    } else {
-        //Retornar objeto como resposta
-        return res.status(400).json({
-            error: false,
-            message: "Erro: Situação encontrado!"
-        });
-    }
-
-
-});
-
-//Criar rota editar
-/**{
-    "id": "1",
-    "nameSituation":"Ativo"
-} */
-router.put("/situations/",eAdmin, async (req, res) => {
-
-    //Receber os dados enviados no corpo da requisição
+    // Receber os dados enviados no corpo da requisição
     const data = req.body;
 
-    //Validar os campos ultilizando o yup
+    // Validar os campos utilizando o yup
     const schema = yup.object().shape({
-        nameSituation: yup.string("Erro: Necessário preencher o campo Nome da Situação!")
-            .required("Erro: Necessário preencher o campo Nome da Situação!"),
-        id: yup.string("Erro: Necessário preencher o campo Id da situação")
-            .required("Erro: Necessário preencher o campo Id da situção"),
+        nameSituation: yup.string("Erro: Necessário preencher o campo nome situação!")
+            .required("Erro: Necessário preencher o campo nome situação!"),
+        id: yup.string("Erro: Necessário enviar o id da situação!")
+            .required("Erro: Necessário enviar o id da situação!")
     });
 
-     //Verificar se todos os campos passaram pela validação
-     try {
+    // Verificar se todos os campos passaram pela validação
+    try {
         await schema.validate(data);
     } catch (error) {
-        //Retornar objeto como resposta
+        // Retornar objeto como resposta
         return res.status(400).json({
             error: true,
             message: error.errors
-
         });
     }
 
-    //Editar no BD
+    // Editar no BD
     await db.Situations.update(data, { where: { id: data.id } })
         .then(() => {
-            //Retonar objeto como resposta
+
+            // Salvar o log no nível info
+            logger.info({ message: "Situação editada com sucesso.", id: data.id, nameSituation: data.nameSituation, userId: req.userId, date: new Date() });
+
+            // Retornar objeto como resposta
             return res.json({
                 error: false,
                 message: "Situação editada com sucesso!"
             });
-
         }).catch(() => {
-            //Retornar objeto como resposta
+
+            // Salvar o log no nível info
+            logger.info({ message: "Situação não editada.", id: data.id, nameSituation: data.nameSituation, userId: req.userId, date: new Date() });
+
+            // Retornar objeto como resposta
             return res.status(400).json({
                 error: true,
                 message: "Erro: Situação não editada com sucesso!"
-
             });
         });
 });
 
-//Criar rota delete
-router.delete("/situations/:id",eAdmin, async (req, res) => {
+// Criar a rota apagar
+// Endereço para acessar a api através de aplicação externa: http://localhost:8080/situations/3
+router.delete("/situations/:id", eAdmin, async (req, res) => {
 
-    //Receber o parâmetro enviado na URL
+    // Receber o parâmetro enviado na URL
     const { id } = req.params;
 
-    //Apagar situação no BD utilizando MODELS users
+    // Apagar situação no BD utilizando a MODELS Situations
     await db.Situations.destroy({
-        //Acrescentar o WHERE na instrução SQL indicando qual registro excluir no BD
+        // Acrescentar o WHERE na instrução SQL indicando qual registro excluir no BD
         where: { id }
-
     }).then(() => {
-        //Retonar objeto como resposta
+
+        // Salvar o log no nível info
+        logger.info({ message: "Situação apagada com sucesso.", id, userId: req.userId, date: new Date() });
+
+        // Retornar objeto como resposta
         return res.json({
             error: false,
-            message: "Situação apagado com sucesso!"
+            message: "Situação apagada com sucesso!"
         });
-
     }).catch(() => {
-        //Retornar objeto como resposta
+
+        // Salvar o log no nível info
+        logger.info({ message: "Situação não apagada.", id, userId: req.userId, date: new Date() });
+
+        // Retornar objeto como resposta
         return res.status(400).json({
             error: true,
-            message: "Erro: Situação não apagado com sucesso!"
+            message: "Erro: Situação não apagada com sucesso!"
         });
     });
 });
 
-//Exportar a instrução que está dentro da constante router
+// Exportar a instrução que está dentro da constante router 
 module.exports = router;

@@ -3,13 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    return queryInterface.addColumn('Users', 'image',{
+    return queryInterface.addColumn('Users', 'password',{
       type: Sequelize.DataTypes.STRING,
-      after:'password',
+      after: 'email'
     });
   },
 
   async down (queryInterface) {
-    return queryInterface.removeColumn('Users','image');
+    return queryInterface.removeColumn('Users', 'password');
   }
 };
+
