@@ -5,11 +5,11 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     return queryInterface.addColumn('Users', 'recoverPassword',{
       type: Sequelize.DataTypes.STRING,
-      after: 'password',
+      after:'password',
     });
   },
 
-  async down (queryInterface, Sequelize) {
-    return queryInterface.removeColumn('Users', 'recoverPassword');
+  async down (queryInterface) {
+    return queryInterface.removeColumn('Users','recoverPassword');
   }
 };

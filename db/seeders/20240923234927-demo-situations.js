@@ -3,25 +3,25 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    // Cadastrar o registro na tabela "situations"
+    //Cadastrar o registro na tabela "situations"
     return queryInterface.bulkInsert('Situations', [
       {
-        nameSituation: "Ativo",
+        nameSituation:"Ativo",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        nameSituation: "Inativo",
+        nameSituation:"Inativo",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        nameSituation: "Spam",
+        nameSituation:"Spam",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        nameSituation: "Aguardando Confirmação",
+        nameSituation:"Aguardando Confirmação",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -29,6 +29,7 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
+    
     
   }
 };

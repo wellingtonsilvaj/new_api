@@ -10,17 +10,17 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
       email: {
         type: Sequelize.STRING,
-        /*unique: true*/
+        /*unique:true*/
       },
       situationId: {
         type: Sequelize.INTEGER,
         defaultValue: 2,
-        // Criar o relacionamento da tabela situations com a tabela users no banco de dados
-        references: { model: 'Situations', key: 'id'}
+        //Criar o relacionamento da tabela situations com a tabela users no BD
+        references:{model: 'Situations', key: 'id'}
       },
       createdAt: {
         allowNull: false,

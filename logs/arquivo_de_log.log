@@ -24,3 +24,11 @@
 {"date":"2024-10-15T23:43:24.685Z","level":"info","message":"Senha editada com sucesso."}
 {"date":"2024-10-15T23:43:29.553Z","level":"info","message":"Chave recuperar senha inválida."}
 {"date":"2024-10-15T23:43:41.566Z","email":"well7@well.com.br","level":"info","message":"Login realizado com sucesso."}
+{"date":"2024-10-16T21:59:54.518Z","email":"well1@well.com.br","level":"warn","message":"E-mail recuperar senha não enviado. Erro editar usuário no BD."}
+{"date":"2024-10-16T22:00:06.708Z","email":"well1564@well.com.br","level":"info","message":"Tentativa recuperar senha com e-mail incorreto."}
+{"date":"2024-10-16T22:21:52.337Z","email":"well1@well.com.br","level":"info","message":"Enviado e-mail com instruções para recuperar a senha."}
+{"date":"2024-10-16T22:23:23.447Z","email":"well1@well.com.br","level":"info","message":"Enviado e-mail com instruções para recuperar a senha."}
+{"date":"2024-10-16T22:42:00.488Z","email":"well1@well.com.br","level":"info","message":"Enviado e-mail com instruções para recuperar a senha."}
+{"date":"2024-10-16T22:45:09.907Z","level":"info","message":"Validar token recuperar senha, token válido."}
+{"date":"2024-10-16T22:45:38.346Z","level":"info","message":"Validar token recuperar senha, token inválido."}
+{"date":"2024-10-16T22:45:43.538Z","level":"info","message":"Validar token recuperar senha, token válido."}

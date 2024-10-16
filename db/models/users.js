@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // Definir as associações
-      Users.belongsTo(models.Situations, { foreignKey: 'situationId' })
+      // define association here
+      Users.belongsTo(models.Situations,{ foreignKey: 'situationId' });
     }
   }
   Users.init({
@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     recoverPassword: DataTypes.STRING,
-    image: DataTypes.STRING,
+    recoverPasswordToken: DataTypes.STRING,
+    image:DataTypes.STRING,
     situationId: DataTypes.INTEGER
   }, {
     sequelize,

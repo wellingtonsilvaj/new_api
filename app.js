@@ -33,12 +33,14 @@ const users = require("./controllers/users");
 const profile = require("./controllers/profile");
 const situations = require("./controllers/situations");
 const login = require("./controllers/login");
+const recoverPasswordToken = require("./controllers/recoverPasswordToken");
 
 // Criar as rotas
 app.use('/', users);
 app.use('/', profile);
 app.use('/', situations);
 app.use('/', login);
+app.use('/',recoverPasswordToken);
 
 // Iniciar o servidor na porta 8080, criar a função utilizando modelo Arrow function para retornar a mensagem de sucesso
 app.listen(8080, () => {
