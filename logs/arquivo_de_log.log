@@ -32,3 +32,12 @@
 {"date":"2024-10-16T22:45:09.907Z","level":"info","message":"Validar token recuperar senha, token válido."}
 {"date":"2024-10-16T22:45:38.346Z","level":"info","message":"Validar token recuperar senha, token inválido."}
 {"date":"2024-10-16T22:45:43.538Z","level":"info","message":"Validar token recuperar senha, token válido."}
+{"date":"2024-10-21T22:25:01.471Z","level":"info","message":"Token recuperar senha inválido."}
+{"date":"2024-10-21T22:25:39.679Z","email":"well1@well.com.br","level":"info","message":"Enviado e-mail com instruções para recuperar a senha."}
+{"date":"2024-10-21T22:26:03.987Z","level":"info","message":"Validar token recuperar senha, token válido."}
+{"date":"2024-10-21T22:28:30.039Z","level":"info","message":"Senha editada com sucesso."}
+{"date":"2024-10-21T22:29:17.255Z","email":"well1@well.com.br","level":"warn","message":"Tentativa de login com senha incorreta."}
+{"date":"2024-10-21T22:29:28.457Z","email":"well1@well.com.br","level":"info","message":"Login realizado com sucesso."}
+{"date":"2024-10-21T22:30:07.613Z","id":1,"level":"info","message":"Perfil visualizado.","userId":1}
+{"date":"2024-10-21T22:30:22.604Z","id":"4","level":"info","message":"Situação visualizada.","userId":1}
+{"date":"2024-10-21T22:30:52.088Z","level":"info","message":"Token recuperar senha inválido."}

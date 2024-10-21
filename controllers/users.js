@@ -28,9 +28,7 @@ router.get("/users", eAdmin, async (req, res) => {
     const { page = 1 } = req.query;
     //console.log(page);
 
-    // Recuperar os valores que estavam no token, tratado no authService.js
-    //console.log(req.userId);
-    //console.log(req.userName);
+
 
     // Limite de registros em cada página
     const limit = 4;
@@ -182,7 +180,8 @@ router.post("/users", eAdmin, async (req, res) => {
         situationId: yup.number("Erro: Necessário preencher o campo situação!")
             .required("Erro: Necessário preencher o campo situação!"),
         password: yup.string("Erro: Necessário preencher o campo senha!")
-            .required("Erro: Necessário preencher o campo senha!"),
+            .required("Erro: Necessário preencher o campo senha!")
+            .min(6, "Erro: A senha deve ter no mínimo 6 caracteres!"),
         email: yup.string("Erro: Necessário preencher o campo e-mail!")
             .required("Erro: Necessário preencher o campo e-mail!")
             .email("Erro: Necessário preencher e-mail válido!"),
@@ -260,8 +259,8 @@ router.post("/users", eAdmin, async (req, res) => {
 // Dados em formato de objeto
 /*{
     "id": 7,
-    "name": "Cesar",
-    "email": "cesar@celke.com.br",
+    "name": "well7",
+    "email": "well7@well.com.br",
     "situationId": 1
 }
 */
@@ -359,7 +358,8 @@ router.put("/users-password", eAdmin, async (req, res) => {
     const schema = yup.object().shape({
 
         password: yup.string("Erro: Necessário preencher o campo senha!")
-            .required("Erro: Necessário preencher o campo senha!"),
+            .required("Erro: Necessário preencher o campo senha!")
+            .min(6, "Erro: A senha deve ter no mínimo 6 caracteres!"),
         id: yup.string("Erro: Necessário enviar o id do usuário!")
             .required("Erro: Necessário enviar o id do usuário!")
     });

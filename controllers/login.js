@@ -29,7 +29,8 @@ router.post("/login", async (req, res) => {
     // Validar os campos utilizando o yup
     const schema = yup.object().shape({
         password: yup.string("Erro: Necessário preencher o campo senha!")
-            .required("Erro: Necessário preencher o campo senha!"),
+            .required("Erro: Necessário preencher o campo senha!")
+            .min(6, "Erro: A senha deve ter no mínimo 6 caracteres!"),
         email: yup.string("Erro: Necessário preencher o campo usuário!")
             .required("Erro: Necessário preencher o campo usuário!")
     });
@@ -110,7 +111,8 @@ router.post("/recover-password", async (req, res) => {
     // Validar os campos utilizando o yup
     const schema = yup.object().shape({
         urlRecoverPassword: yup.string("Erro: Necessário enviar a URL!")
-            .required("Erro: Necessário enviar a URL!"),
+            .required("Erro: Necessário enviar a URL!")
+            .min(6, "Erro: A senha deve ter no mínimo 6 caracteres!"),
         email: yup.string("Erro: Necessário preencher o campo e-mail!")
             .required("Erro: Necessário preencher o campo e-mail!")
     });
